@@ -1,3 +1,9 @@
+<!--
+ * @Author: sjc
+ * @Date: 2020-03-10 22:21:03
+ * @LastEditTime: 2020-03-11 00:08:54
+ * @Description: 
+ -->
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
@@ -34,7 +40,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'VueTable',
   props: {
     msg: String
   }

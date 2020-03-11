@@ -1,7 +1,7 @@
 <!--
  * @Author: sjc
  * @Date: 2020-03-10 22:21:03
- * @LastEditTime: 2020-03-11 03:12:53
+ * @LastEditTime: 2020-03-11 13:04:06
  * @Description: md to json
  -->
 <template>
@@ -41,9 +41,14 @@ export default {
         let md = window.markdownit();
         //格式化为token数组
         let res = md.parse(e.currentTarget.result);
+        // this.test(e.currentTarget.result)
         console.log(res, 'arr')
         this.convertJson(res)
       }
+    },
+    test(value){
+       let firstArr = value.split('###')
+       console.log(firstArr)
     },
     convertJson (arr) {
       let initArr = []
@@ -68,21 +73,30 @@ export default {
       for (let index = 0; index < initArr.length; index++) {
         finalArr[index] = {}
         for (let i = 0; i < initArr[index].length; i++) {
-          // let singleObj = {}
+          // h3标题为题目
           if (initArr[index][i].type === 'heading_open' && initArr[index][i].tag === 'h3') {
             finalArr[index].title = initArr[index][i + 1].content
+            finalArr[index].answer = initArr[index][i + 4].content
           }
+          // h4标题分为题目类型和解答
           if (initArr[index][i].type === 'heading_open' && initArr[index][i].tag === 'h4') {
             console.log(i, 'i', initArr[index][i + 1])
             if (initArr[index][i + 1].content === '选项') {
               finalArr[index].type = 'SELECT'
+              finalArr[index].options = []
+              if (initArr[index][i + 3].tag === 'ol') {
+               console.log(initArr[index][i + 3])
+              }
+
             } 
-            // else {
-            //   if (initArr[index][i + 1].content === '解答') {
-            //     console.log(initArr[index][i + 1].content)
-            //   } else {
-            //     finalArr[index].type = 'FILL'
-            //   }
+            else if (initArr[index][i + 1].content === '解答') {
+              finalArr[index].init = initArr[index][i + 4].content
+            } 
+            // else { 
+            //   finalArr[index].type = 'FILL'
+            //   // else {
+            //   //   finalArr[index].type = 'FILL'
+            //   // }
             // }
           }
         }

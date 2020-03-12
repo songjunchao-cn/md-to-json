@@ -6,9 +6,11 @@
  -->
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <input type="file" ref="file" @change="getFile" />
-    <VueTable msg="Welcome to Your Vue.js App" />
+    <div class="btn-wrap" @click="handleClick">
+      <input class="file-input" ref="file" type="file" @change="getFile" />
+      导入
+    </div>
+    <VueTable :finalArr="finalArr" />
   </div>
 </template>
 
@@ -30,6 +32,9 @@ export default {
   mounted () {
   },
   methods: {
+    handleClick () {
+      this.$refs.file.click()
+    },
     getFile (e) {
       let files = e.target.files
       this.convertFile(files[0])
@@ -38,17 +43,11 @@ export default {
       let reader = new FileReader()
       reader.readAsText(file);
       reader.onload = (e) => {
-        let md = window.markdownit();
+        let md = window.markdownit()
         //格式化为token数组
-        let res = md.parse(e.currentTarget.result);
-        // this.test(e.currentTarget.result)
-        console.log(res, 'arr')
+        let res = md.parse(e.currentTarget.result)
         this.convertJson(res)
       }
-    },
-    test(value){
-       let firstArr = value.split('###')
-       console.log(firstArr)
     },
     convertJson (arr) {
       let initArr = []
@@ -67,11 +66,8 @@ export default {
           initArr.push(sliceArr)
         }
       }
-      // let inlineArr = arr.filter(item => item.type === 'inline')
-      // let titleArr = arr.filter(item => item.tag === 'h3')
-      // console.log(titleArr)
       for (let index = 0; index < initArr.length; index++) {
-        finalArr[index] = {}
+        finalArr[index] = { id: index, type: 'FILL', createdAt: new Date(Date.now()).toISOString() }
         for (let i = 0; i < initArr[index].length; i++) {
           // h3标题为题目
           if (initArr[index][i].type === 'heading_open' && initArr[index][i].tag === 'h3') {
@@ -80,33 +76,60 @@ export default {
           }
           // h4标题分为题目类型和解答
           if (initArr[index][i].type === 'heading_open' && initArr[index][i].tag === 'h4') {
-            console.log(i, 'i', initArr[index][i + 1])
             if (initArr[index][i + 1].content === '选项') {
               finalArr[index].type = 'SELECT'
               finalArr[index].options = []
-              if (initArr[index][i + 3].tag === 'ol') {
-               console.log(initArr[index][i + 3])
+              //ol标签开启
+              if (initArr[index][i + 3].type === 'ordered_list_open') {
+                let olIndex = initArr[index].findIndex((element) => (element.type === 'ordered_list_close'))
+                let olArr = initArr[index].slice(i + 3, olIndex)
+                olArr.forEach(element => {
+                  if (element.type === 'inline' && element.content) {
+                    finalArr[index].options.push(element.content)
+                  }
+                })
               }
 
-            } 
+            }
+            //解答
             else if (initArr[index][i + 1].content === '解答') {
-              finalArr[index].init = initArr[index][i + 4].content
-            } 
-            // else { 
-            //   finalArr[index].type = 'FILL'
-            //   // else {
-            //   //   finalArr[index].type = 'FILL'
-            //   // }
-            // }
+              finalArr[index].hint = initArr[index][i + 4].content
+            }
           }
         }
-        //  if (Object.keys(this.singleObj).length > 0) {
-        //     finalArr[index]=this.singleObj
-        //   }
       }
-      // this.finalArr = Array(titleArr.length / 2).fill({})
       console.log(finalArr, 'finalArr')
+      this.finalArr = finalArr
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.file-input {
+  display: none;
+}
+.btn-wrap {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  user-select: none;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 15px;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: color 0.2s linear, background-color 0.2s linear,
+    border 0.2s linear, box-shadow 0.2s linear;
+  color: #515a6e;
+  background-color: #fff;
+  border-color: #dcdee2;
+}
+.btn-wrap:hover {
+  color: #57a3f3;
+  border-color: #57a3f3;
+}
+</style>

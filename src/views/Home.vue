@@ -101,7 +101,7 @@ export default {
                   hintArr.push(element.content)
                 }
               });
-              finalArr[index].hint = hintArr.join('')
+              finalArr[index].hint = hintArr.join('\n\n')
             }
           }
         }

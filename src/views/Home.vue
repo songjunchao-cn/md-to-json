@@ -93,7 +93,15 @@ export default {
             }
             //解答
             else if (initArr[index][i + 1].content === '解答') {
-              finalArr[index].hint = initArr[index][i + 4].content
+              console.log(initArr[index], i + 1)
+              let hintTempArr = initArr[index].slice(i + 2, initArr[index].length)
+              let hintArr = []
+              hintTempArr.forEach(element => {
+                if (element.content) {
+                  hintArr.push(element.content)
+                }
+              });
+              finalArr[index].hint = hintArr
             }
           }
         }

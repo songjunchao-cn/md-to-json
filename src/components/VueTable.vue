@@ -26,7 +26,9 @@
         <td>
           <span v-for="(ele,index) in item.options" :key="ele">{{index+1}}.{{ele}}&nbsp;</span>
         </td>
-        <td>{{item.hint}}</td>
+        <td>
+          <div v-for="element in item.hint" :key="element">{{element}}</div>
+        </td>
         <td>{{item.type==='FILL'?'填空':'选择' }}</td>
         <td>{{$dateFormat(item.createdAt,'yyyy-MM-dd hh:mm:ss') }}</td>
       </tr>
